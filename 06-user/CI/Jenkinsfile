@@ -112,7 +112,7 @@ pipeline {
 
         stage('Trigger Deployment') {
             steps {
-                scripts {
+                script {
                     build job: "${component}-CD", parameters: [string(name: 'image_version', value: "${appversion}"), string(name: 'Deploy_to', value: "${params.environment}")]
                 }
             }
