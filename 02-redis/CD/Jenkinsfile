@@ -64,7 +64,7 @@ pipeline {
 
                             def rolloutStatus = sh (
                                 script: "kubectl rollout status deployment/${component} -n ${namespace} || echo FAILED"
-                                returnstdout: true
+                                returnStdout: true
                             ).trim()
 
                             if (rolloutStatus.containes("successfully rolled out")) {
