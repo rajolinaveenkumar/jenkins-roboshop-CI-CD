@@ -64,7 +64,7 @@ pipeline {
         
         stage('Sonar Qube') {
             environment {
-                SCANNER_HOME = tool 'sonar-6.0'
+                SCANNER_HOME = tool 'sonar-7.0'
             }
 
             steps {
