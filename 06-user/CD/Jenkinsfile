@@ -38,7 +38,7 @@ pipeline {
                                 kubectl get nodes
                                 kubectl get pods -n roboshop
 
-                                cd 06-user/CI/user-helm
+                                cd 06-user/CD/user-helm
                                 sed -i "s/IMAGE_VERSION/${params.image_version}/g" values-${params.Deploy_to}.yaml
 
                                 helm upgrade --install ${component}-chart -n ${namesapce} -f values-${params.Deploy_to}.yaml .

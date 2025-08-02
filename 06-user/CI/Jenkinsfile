@@ -98,6 +98,7 @@ pipeline {
                     params.build_image
                 }
             }
+            
             steps {
                 dir('06-user/CI') {
                     script {
