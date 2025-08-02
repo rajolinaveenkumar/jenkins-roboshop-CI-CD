@@ -1,0 +1,117 @@
+pipeline {
+    agent {
+        label 'agent-1-label'
+    }
+
+    environment {
+        project = 'roboshop'
+        env_name = 'dev'
+        tier = 'backend'
+        component = 'user'
+        component_1 = 'frontend'
+        acc_id = '343430925817'
+        region = 'us-east-1'
+        label = 'agent-1-label'
+        namespace = 'roboshop'
+        appversion = ''
+    }
+
+    options {
+        ansiColor('xtrem')
+        timeout(time: 30, unit: 'MINUTES')
+        disableConcurrentBuild()
+        timestamps()
+    }
+
+    parameters {
+        string(name: 'SNOW_CR', defaultValue: '', description: 'Please provide chnage request number')
+        choice(name: 'environmnet', choices: ['dev', 'qa', 'pre-prod', 'prod'], description: 'Please choose the environment')
+
+        booleanParam(name: 'build_image', defaultValue: false, description: 'Please check the box to build the image')
+
+        booleanParam(name: 'deploy', defaultValue: false, description: 'Please check the box to deploy')
+    }
+
+    stages {
+        stage('Read Version') {
+            steps {
+                dir('06-use/CI') {
+                    script {
+                        def packagejson = readJSON file: 'code/package.json'
+                        appversion = packagejson,version
+                        echo "appversion is ${appversion}"
+                    }
+                }
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    sh """
+                        cd 06-use/CI/code
+                        npm install
+                    """
+                }
+            }
+        }
+
+        stage('Unit Test') {
+            steps {
+                script {
+                    sh """
+                        echo "Unit tests are created by developers, we will configure the command like npm test"
+                    """
+                }
+            }
+        }
+
+        stage('Sonar Qube') {
+            environment {
+                SCANNER_HOME = tool 'sonar-7.0'
+            }
+
+            steps {
+                withSonarQubeEnv('sonar-7.0') {
+                    dir('06-user/CI') {
+                        sh """
+                            $SCANNER_HOME/bin/sonar-scanner
+
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 8, unit: 'MINUTES') {
+                    waitForQualityGate abortpipeline: true
+                }
+
+            }
+        }
+
+
+
+    }
+
+
+
+    post {
+        always {
+            echo "This run allways"
+            deleteDir()
+        }
+
+        success {
+            echo "This run only when success"
+        }
+
+        failure {
+            echo "This runs only when job failure"
+        }
+    }
+
+
+}
