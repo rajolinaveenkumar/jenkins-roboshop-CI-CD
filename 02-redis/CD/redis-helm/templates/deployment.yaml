@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: redis-db 
+  namespace: roboshop
+  labels:
+    project: roboshop
+    component: redis
+    environment: dev
+    tier: database
+    code: redis-roboshop-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      code: redis-roboshop-dev
+  template:
+    metadata:
+      labels:
+        project: roboshop
+        component: redis
+        environment: dev
+        tier: database
+        code: redis-roboshop-dev
+    spec:
+      containers:
+      - name: redis
+        image: "{{ .Values.deployment.image_url }}:{{ .Values.deployment.image_version }}"
+        ports:
+        - containerPort: 6379

@@ -1,0 +1,74 @@
+pipeline {
+    agent {
+        label 'agent-1-label'
+    }
+
+     environment {
+        project = 'roboshop'
+        env_name = 'dev'
+        tier = 'database'
+        component = 'redis'
+        acc_id = '343430925817'
+        region = 'us-east-1'
+        label = 'agent-1-label'
+        namespace = 'roboshop'
+    }
+
+    options {
+        ansiColor('xtrem')
+        timeout(time: 40, uint: 'MINUTES')
+        disableConcurrentBuilds()
+        timestamps()
+    }
+
+    parameters {
+        string(name: 'image_version', defaultValue: '', description: 'please provide the image version')
+        choice(name: 'Deploy_to', choices: ['staging', 'dev', 'qa', 'prod'], description: 'please choose the environment to deploy')
+    }
+
+    stages {
+        stage('Deploy') {
+            steps {
+                script {
+                    withAWS(region: 'us-east-1', credentails: 'aws-auth') {
+                        try {
+                            sh """
+                                echo "Setting kube config"
+                                aws eks update-kubeconfig --region ${region} --name ${project}-${env_name}-eks
+
+                                echo "Checking cluster nodes"
+                                kubectl get nodes
+
+                                cd 02-redis/CD
+
+                                echo "Preparing Helm Deployments"
+                                sed -i "s/IMAGE_VERSION/${params.image_version}" values-${params.Deploy_to}
+
+                                echo "Deploying new version with helm"
+                                helm upgrade --install ${component}-chart -n ${namespace} -f values-${params.Deploy_to} .
+
+
+                            """        
+                        }
+
+                        catch (err) {
+                            echo "Helm upgrade failed. Rollback to previews version "
+
+                            sh """ 
+                                echo "Rollback the previews version"
+                                helm rollback ${component}-chart -n ${namespace}
+                                sleep 30 # wait for pods to stabilize
+                            """
+
+                            // check status after rollback
+
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+}

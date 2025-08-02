@@ -46,7 +46,8 @@ pipeline {
                                 helm upgrade --install ${component}-chart -n ${namespace} -f values-${params.environment}.yaml .
 
                             """
-                        } catch (err) {
+                        } 
+                        catch (err) {
                             echo "Helm upgare failed. Atempting rollback"
                             echo "Rollback to previews version"
 

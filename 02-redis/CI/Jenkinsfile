@@ -1,0 +1,83 @@
+pipeline {
+    agent {
+        label 'agent-1-label'
+    }
+
+    environment {
+        project = 'roboshop'
+        env_name = 'dev'
+        tier = 'database'
+        component = 'redis'
+        acc_id = '343430925817'
+        region = 'us-east-1'
+        label = 'agent-1-label'
+    }
+
+    optiones {
+        ansiColor('xtrem') 
+        timeout(time: 40, unit: 'MINUTES')
+        disableConcurrentBuilds()
+        timestamps()
+    }
+
+    parameters {
+        string(name: 'SNOW_CR', defaultValue: '', description: 'please provide change request')
+        string(name: 'image_version', defaultValue: '', description: 'please provide image version')
+        choice(name: 'environment', choices: ['dev', 'staging', 'qa', 'pre-prod', 'prod'], description: 'please select the environment')
+        booleanParam(name: 'BUILD_IMAGE', defaultValue: false, description: 'Check the box to build the image')
+        booleanParam(name: 'Deploy', defaultValue: fasle, description: 'check the box to deploy')
+    }
+
+    stages {
+        when {
+            expression {
+                params.BUILD_IMAGE
+            }
+        }
+        stage('Build the image') {
+            steps {
+                script {
+                    withAWS(region: 'us-east-1', credentails: 'aws-auth') {
+                        sh """
+                            aws ecr get-login-password --region ${region} | docker login --username AWS --password-stdin ${acc_id}.dkr.ecr.${region}.amazonaws.com
+
+                            cd 02-redis/CI
+
+                            docker build -t ${acc_id}.dkr.ecr.${region}.amazonaws.com/${project}-${params.environment}/${component}:${params.image_version} .
+
+                            docker images
+
+                            docker push ${acc_id}.dkr.ecr.${region}.amazonaws.com/${project}-${params.environment}/${component}:${params.image_version}
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Trigger Deploy') {
+            when {
+                expression {
+                    params.Deploy
+                }
+            }
+            steps {
+                build job: "${component}-CD", parameters: [string(name: 'image_version', value: "${params.image_version}"), string(name: 'environment', value: "${params.environment}")]
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "this one run always"
+            deleteDir()
+        }
+
+        success {
+            echo "this run only when success"
+        }
+
+        failure {
+            echo "this run only when failure"
+        }
+    }
+}
