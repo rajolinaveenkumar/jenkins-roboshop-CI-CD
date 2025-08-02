@@ -33,7 +33,8 @@ pipeline {
             }
             steps {
                 script {
-                    def packagejson = readJSON file: 'scripts/package.json'
+                    
+                    def packagejson = readJSON file: '05-catalogue/CI/scripts/package.json'
                     appversion = packagejson.version
                     echo "app version is ${appversion}"
                 }
