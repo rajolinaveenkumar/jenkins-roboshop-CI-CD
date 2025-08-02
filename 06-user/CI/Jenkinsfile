@@ -35,7 +35,7 @@ pipeline {
     stages {
         stage('Read Version') {
             steps {
-                dir('06-use/CI') {
+                dir('06-user/CI') {
                     script {
                         def packagejson = readJSON file: 'code/package.json'
                         appversion = packagejson.version
