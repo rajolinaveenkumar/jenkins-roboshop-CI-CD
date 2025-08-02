@@ -69,11 +69,12 @@ pipeline {
 
             steps {
                 withSonarQubeEnv('sonar-7.0') {
-                    sh """
-                        ls -la
-                        $SCANNER_HOME/bin/sonar-scanner
-                    """
-                    
+                    dir('05-catalogue/CI') {
+                        sh """
+                            ls -la
+                            $SCANNER_HOME/bin/sonar-scanner
+                        """
+                    }
                 }
             }
         }
