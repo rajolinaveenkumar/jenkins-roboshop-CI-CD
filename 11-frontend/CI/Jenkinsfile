@@ -8,6 +8,7 @@ pipeline {
         env_name = 'dev'
         tier = 'web'
         component = 'frontendroboshop'
+        component_1 = 'frontend'
         acc_id = '343430925817'
         region = 'us-east-1'
         label = 'agent-1-label'
@@ -116,7 +117,7 @@ pipeline {
             }
             steps {
                 script {
-                    build job: "${component}-CD", parameters: [string(name: 'image_version', value: "${appversion}"), string(name: 'Deploy_to', value: "${params.environment}")]
+                    build job: "${component_1}-CD", parameters: [string(name: 'image_version', value: "${appversion}"), string(name: 'Deploy_to', value: "${params.environment}")]
                 }
             }
         }
