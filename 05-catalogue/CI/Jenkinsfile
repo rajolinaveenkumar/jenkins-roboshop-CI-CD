@@ -110,6 +110,11 @@ pipeline {
         }
 
         stage('Trigger Deploy') {
+            when {
+                expression {
+                    params.Deploy
+                }
+            }
             steps {
                 script {
                     build job: "${component}-CD", parameters: [string(name: 'image_version', value: "${appversion}"), string(name: 'Deploy_to', value: "${params.environment}")]
