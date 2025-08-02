@@ -37,7 +37,9 @@ pipeline {
                                     aws eks update-kubeconfig --region ${region} --name ${project}-${env_name}-eks
 
                                     kubectl get nodes
-                                    cd ${component}-helm                             
+                                    pwd
+                                    cd ${component}-helm 
+                                    pwd                            
 
                                      sed -i "s/IMAGE_VERSION/${params.image_version}/g" ${component}-${env_name}.yaml
                                     helm upgrade --intsall ${component}-chart -f ${component}-${env_name}.yaml .
