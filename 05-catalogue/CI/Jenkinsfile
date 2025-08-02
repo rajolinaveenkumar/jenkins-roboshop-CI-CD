@@ -69,7 +69,7 @@ pipeline {
 
             steps {
                 withSonarQubeEnv('sonar-7.0') {
-                    sh "$SCANNER_HOME/bin/sonnar-scanner"
+                    sh "$SCANNER_HOME/bin/sonar-scanner"
                 }
             }
         }
