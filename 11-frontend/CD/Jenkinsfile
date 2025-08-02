@@ -60,7 +60,7 @@ pipeline {
                                 returnStdout: true
                             ).trim()
 
-                            if (rolloutStatus.contains(""successfully rolled out"")) {
+                            if (rolloutStatus.contains("successfully rolled out")) {
                                 echo "Helm upgrade failed and rollbacked to previous version"
                                 error "Helm Upgarde. Please look into it"
                             } else {
