@@ -39,11 +39,13 @@ pipeline {
                     script {
                         def packagejson = readJSON file: 'code/package.json'
                         appversion = packagejson.version
-                        echo "app version is ::: ${appversion}"
+                        echo "app version is ${appversion}"
                     }
                 }
             }
         }
+
+        
 
         stage('Unit Tests') {
             steps {
