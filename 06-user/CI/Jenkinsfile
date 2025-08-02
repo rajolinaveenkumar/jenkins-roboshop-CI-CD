@@ -92,6 +92,31 @@ pipeline {
             }
         }
 
+        stage('Build Image') {
+            steps {
+                dir('06-user/CI') {
+                    script {
+                        withAWS(region: 'us-east-1', credentials: 'aws-auth') {
+                            sh """
+                                aws ecr get-login-password --region ${region} | docker login --username AWS --password-stdin ${acc_id}.dkr.ecr.${region}.amazonaws.com
+
+                                docker build -t ${acc_id}.dkr.ecr.${region}.amazonaws.com/${project}-${params.environmnet}/${component}:${appversion} .
+
+                                docker push ${acc_id}.dkr.ecr.${region}.amazonaws.com/${project}-${params.environmnet}/${component}:${appversion}
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Trigger Deployment') {
+            steps {
+                scripts {
+                    build job: "${component}-CD", parameters: [string(name: 'image_version', value: "${appversion}"), string(name: 'Deploy_to', value: "${params.environment}")]
+                }
+            }
+        }
 
 
     }

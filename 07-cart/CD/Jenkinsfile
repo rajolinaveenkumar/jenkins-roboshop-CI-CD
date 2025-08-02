@@ -1,0 +1,50 @@
+pipeline {
+    agent {
+        label 'agent-1-label'
+    }
+
+    environment {
+        project = 'roboshop'
+        env_name = 'dev'
+        tier = 'backend'
+        component = 'catalogue'
+        acc_id = '343430925817'
+        region = 'us-east-1'
+        label = 'agent-1-label'
+        namespace = 'roboshop'
+    }
+
+    options {
+        ansiColor('xtrem')
+        disableConcurrentBuilds()
+        timeout(time: 30, unit: 'MINUTES')
+        timestamps()
+    } 
+
+    parameters {
+        string(name: 'image_version', defaultValue: '', description: 'Please provide the image version')
+        choice(name: 'Deploy_to', choices: ['dev', 'qa', 'prod'], description: 'please select the environment')
+    }
+
+    stages {
+        stage 
+    }
+
+
+
+
+
+    post {
+        always {
+            echo "this run always "
+            deleteDir()
+        }
+        success {
+            echo "this run only when success"
+        }
+
+        failure {
+            echo "this run only when failure"
+        }
+    }
+}

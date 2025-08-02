@@ -1,0 +1,92 @@
+pipeline {
+    agent {
+        label 'agent-1-label'
+    }
+
+    environment {
+        project = 'roboshop'
+        env_name = 'dev'
+        tier = 'backend'
+        component = 'user'
+        acc_id = '343430925817'
+        region = 'us-east-1'
+        label = 'agent-1-label'
+        namespace = 'roboshop'
+    }
+
+    options {
+        ansiColor('xtrem')
+        disableConcurrentBuilds()
+        timeout(time: 30, unit: 'MINUTES')
+        timestamps()
+    } 
+
+    parameters {
+        string(name: 'image_version', defaultValue: '', description: 'Please provide the image version')
+        choice(name: 'Deploy_to', choices: ['dev', 'qa', 'prod'], description: 'please select the environment')
+    }
+
+    stages {
+        stage('Deployment') {
+            steps {
+                script {
+                    withAWS(region: 'us-east-1', credentials: 'aws-auth') {
+                        try {
+                            sh """
+                                aws eks update-kubeconfig --region ${region} --name ${project}-${params.Deploy_to}-eks
+
+                                kubectl get nodes
+                                kubectl get pods -n roboshop
+
+                                cd 06-user/CI/user-helm
+                                sed -i "s/IMAGE_VERSION/${params.image_version}/g" values-${params.Deploy_to}.yaml
+
+                                helm upgrade --install ${component}-chart -n ${namesapce} -f values-${params.Deploy_to}.yaml .
+
+                            """
+                        }
+
+                        catch (err) {
+                            echo "Helm upgrade failed. Rollback to previous version"
+
+                            sh """
+                                helm rollback ${component}-chart -n ${namespace}
+                                sleep 30
+                            """
+
+                            def rolloutStatus = sh(
+                                script: "kubectl rollout status deployment/${COMPONENT} -n ${PROJECT} || echo FAILED",
+                                returnStdout: true
+                            ).trim()
+
+                            if (rolloutStatus.contains("successfully rolled out")) {
+                                echo "Helm upgarde failed. Rollbacked to previous version"
+                                error "Helm upgarde failed. Please resolve it ASAP"
+                            } else {
+                                error "Helm upgarde failed and rollback also failed"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+
+
+
+    post {
+        always {
+            echo "this run always "
+            deleteDir()
+        }
+        success {
+            echo "this run only when success"
+        }
+
+        failure {
+            echo "this run only when failure"
+        }
+    }
+}
