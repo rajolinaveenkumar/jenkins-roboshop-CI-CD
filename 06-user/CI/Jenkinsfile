@@ -93,6 +93,11 @@ pipeline {
         }
 
         stage('Build Image') {
+            when {
+                expression {
+                    params.build_image
+                }
+            }
             steps {
                 dir('06-user/CI') {
                     script {
@@ -111,6 +116,11 @@ pipeline {
         }
 
         stage('Trigger Deployment') {
+            when {
+                expression {
+                    params.Deploy_to
+                }
+            }
             steps {
                 script {
                     build job: "${component}-CD", parameters: [string(name: 'image_version', value: "${appversion}"), string(name: 'Deploy_to', value: "${params.environment}")]
