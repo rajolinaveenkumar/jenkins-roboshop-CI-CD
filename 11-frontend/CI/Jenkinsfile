@@ -29,7 +29,7 @@ pipeline {
         
         booleanParam(name: 'build_image', defaultValue: false, description: 'please check the box to build the image')
 
-        booleanParm(name: 'deploy', defaultValue: false, description: 'please check the box to deploy')
+        booleanParam(name: 'deploy', defaultValue: false, description: 'please check the box to deploy')
     }
 
     stages {
