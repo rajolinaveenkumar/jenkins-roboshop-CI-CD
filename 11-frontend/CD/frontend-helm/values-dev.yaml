@@ -1,0 +1,8 @@
+# to point out this folder at run time like below 
+# helm upgrade --install catalogue-chart -f values-dev.yaml
+
+deployment:
+  image_url: 343430925817.dkr.ecr.us-east-1.amazonaws.com/roboshop-dev/frontendroboshop
+  image_version: 1.0.0
+tgb:
+  arn: arn:aws:elasticloadbalancing:us-east-1:343430925817:targetgroup/roboshop-dev-frontend-TG/3eb6df010f8753a5

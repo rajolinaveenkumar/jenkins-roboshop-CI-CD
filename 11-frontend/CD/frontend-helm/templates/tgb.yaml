@@ -1,0 +1,17 @@
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: TargetGroupBinding
+metadata:
+  name: frontend-tgb
+  namespace: roboshop
+  labels:
+    project: roboshop
+    component: frontendroboshop
+    environment: dev
+    tier: frontend
+    code: frontend-roboshop-dev  
+spec:
+  serviceRef:
+    name: frontend-svc # route traffic to the frontend-service
+    port: 80
+  targetGroupARN: {{ .Values.tgb.arn }}
+  targetType: ip
