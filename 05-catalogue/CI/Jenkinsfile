@@ -1,5 +1,7 @@
 pipeline {
-    agent none
+    agent {
+        label 'agent-1-label'
+    }
 
     environment {
         project = 'roboshop'
@@ -28,9 +30,7 @@ pipeline {
 
     stages {
         stage('read the version') {
-            agent {
-                label 'agent-1-label'
-            }
+            
             steps {
                 script {
                     
