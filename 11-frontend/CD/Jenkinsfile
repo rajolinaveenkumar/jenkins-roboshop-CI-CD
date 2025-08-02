@@ -23,7 +23,7 @@ pipeline {
     }
 
     parameters {
-        string(name: 'image_version', defaultValue: '', descriptions: 'please provide the image version')
+        string(name: 'image_version', defaultValue: '', description: 'please provide the image version')
 
         choice(name: 'Deploy_to', choices: ['dev', 'qa', 'prod'] ,description: 'Please choose the environemnt' )
     }
