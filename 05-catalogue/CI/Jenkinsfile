@@ -40,6 +40,28 @@ pipeline {
                 }
             }
         }
+
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    sh """
+                        cd 05-catalogue/CI/scripts/
+                        npm install
+                    """
+                }
+            }
+        }
+
+        stage('Unit Tests') {
+            steps {
+                script {
+                    sh """
+                        echo "Unit tests are created by developers, we will configure the command like npm test"
+                    """
+                }
+            }
+        }
+        
     }
 
     post {
