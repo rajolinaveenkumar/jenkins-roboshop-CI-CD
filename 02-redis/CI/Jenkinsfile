@@ -29,14 +29,13 @@ pipeline {
     }
 
     stages {
-        when {
-            expression {
-                
-                params.Build_Image
-                
+        
+        stage('Build the image') {
+            when {
+            expression {                
+                params.Build_Image                
             }
         }
-        stage('Build the image') {
             steps {
                 script {
                     withAWS(region: 'us-east-1', credentails: 'aws-auth') {
