@@ -1,0 +1,4 @@
+apiVersion: v1
+name: cart-chart
+version: 0.0.1
+description: This is the user component applicationn

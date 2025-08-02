@@ -119,7 +119,7 @@ pipeline {
         stage('Trigger Deployment') {
             when {
                 expression {
-                    params.Deploy_to
+                    params.deploy
                 }
             }
             steps {
