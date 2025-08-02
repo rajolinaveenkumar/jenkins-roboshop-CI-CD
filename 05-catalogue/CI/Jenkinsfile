@@ -86,7 +86,29 @@ pipeline {
                 }
             }
         }
-        
+
+        stage('Build the image') {
+            when {
+                expression {
+                    param.Build_Image
+                }
+            }
+            steps {
+                dir('05-catalogue/CI') {
+                    script {
+                        withAWS(region: 'us-east-1', credentails: 'aws-auth')
+                            sh """
+                                aws ecr get-login-password --region ${region} | docker login --username AWS --password-stdin ${acc_id}.dkr.ecr.${region}.amazonaws.com
+
+                                docker build -t ${acc_id}.dkr.ecr.${region}.amazonaws.com/${project}-${params.environment}/${component}:${appversion} .
+
+                                docker push ${acc_id}.dkr.ecr.${region}.amazonaws.com/${project}-${params.environment}/${component}:${appversion}           
+                            """
+                    }
+                }
+            }
+        }
+
     }
 
     post {
