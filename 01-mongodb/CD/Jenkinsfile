@@ -41,10 +41,9 @@ pipeline {
                                 echo "Preparing Helm deployment..."
                                 cd 01-mongodb/CD/mongodb-helm
                                 sed -i "s/IMAGE_VERSION/${params.image_version}/g" values-${params.environment}.yaml
-                                ls -ls 
-                                pwd
+                                
                                 echo "Deploying new version with Helm..."
-                                helm upgrade --install ${component}-chart -n ${namespace} -f values-${params.environment}.yaml
+                                helm upgrade --install releasename-1 ${component}-chart -n ${namespace} -f values-${params.environment}.yaml
 
                             """
                         } catch (err) {
