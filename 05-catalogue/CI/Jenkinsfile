@@ -6,8 +6,8 @@ pipeline {
     environment {
         project = 'roboshop'
         env_name = 'dev'
-        tier = 'database'
-        component = 'mongodb'
+        tier = 'backend'
+        component = 'catalogue'
         acc_id = '343430925817'
         region = 'us-east-1'
         label = 'agent-1-label'

@@ -1,0 +1,127 @@
+pipeline {
+    agent {
+        label 'agent-1label'
+    }
+
+    environment {
+        project = 'roboshop'
+        env_name = 'dev'
+        tier = 'backend'
+        component = 'catalogue'
+        acc_id = '343430925817'
+        region = 'us-east-1'
+        label = 'agent-1-label'
+        namespace = 'roboshop'
+    }
+
+    options {
+        ansiColor('xtrem')
+        disableConcurrentBuilds()
+        timeout(time: '30', unit: 'MINUTES')
+        timestamps()
+    } 
+
+    parameters {
+        string(name: 'image_version', defaultValue: '', description: 'Please provide the image version')
+        choice(name: 'Deploy_to', choices: ['dev', 'qa', 'prod'], description: 'please select the environment')
+    }
+
+    stages {
+        stage('Deploy') {
+            steps {
+                dir('05-catalogue/CI') {
+                   script {
+                        withAWS(region: 'us-east-1', credentials: 'aws-auth') {
+                            try {
+                                sh """
+                                    aws eks update-kubeconfig --region ${region} --name ${component}-${env_name}-eks
+
+                                    kubectl get nodes
+                                    cd ${component}-helm                             
+
+                                     sed -i "s/IMAGE_VERSION/${params.image_version}/g" ${component}-${env_name}.yaml
+                                    helm upgrade --intsall ${component}-chart -f ${component}-${env_name}.yaml .
+
+                                """
+
+                            }
+
+                            catch (err) {
+                                echo "Helm upgrade is failed, rollback to previous version" 
+
+                                sh """
+                                    helm rollback ${component}-chart -n ${project}
+                                    sleep 30
+                                """
+
+                                def rolloutStatus = sh(
+                                    script: "kubectl get deployments/${component} -n ${namespace} || echo Failed"
+                                    returnStdout: true
+                                ).trim()
+
+                                if(rolloutStatus.containes("successfully rolled out")) {
+                                    echo "helm upgrade failed and rollback to previous version"
+                                    error "Helm upgrade failed. Please check and resolve the issue"             
+                                } else {
+                                    error "Helm upgrade and rollback is failed"
+                                }
+
+
+                            }
+                        }
+
+                   }
+                }
+            }
+        
+        }
+        stage('Functional/API Tests') {
+            when{
+                expression { params.environment == 'dev'}
+            }
+            
+            steps {
+                script{
+                    
+                        sh """
+                            echo "functional tests will be performed after DEV deployment. Usual;y these are automated selenium test cases written by testing team. If these test cases are failed pipeline also fails"
+                        """
+                    
+                }
+            }
+        }
+
+        stage('Integration Tests') {
+            when{
+                expression { params.deploy_to == 'qa'}
+            }
+            
+            steps {
+                script{
+                    
+                        sh """
+                            echo "integrations tests will be performed after QA/UAT deployment. Usually these are automated BDD(Behaviour driven development) test cases in cucumber framework written by testing team. If these test cases are failed pipeline also fails"
+                        """
+                    
+                }
+            }
+        }
+        
+    }
+
+    post {
+        always {
+            echo "this run always"
+            deleteDir()
+        }
+
+        success {
+            echo "This runs only when success"
+        }
+
+        failure {
+            echo "This runs only when failure"
+        }
+    
+    }
+}
