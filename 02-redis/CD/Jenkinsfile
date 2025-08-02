@@ -63,7 +63,7 @@ pipeline {
                             // check the rollout status after rollback
 
                             def rolloutStatus = sh (
-                                script: "kubectl rollout status deployment/${component} -n ${namespace} || echo FAILED"
+                                script: "kubectl rollout status deployment/${component} -n ${namespace} || echo FAILED",
                                 returnStdout: true
                             ).trim()
 
