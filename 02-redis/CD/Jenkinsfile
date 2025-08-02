@@ -39,7 +39,8 @@ pipeline {
                                 echo "Checking cluster nodes"
                                 kubectl get nodes
 
-                                cd 02-redis/CD
+                                cd 02-redis/CD/redis-helm
+                                pwd
 
                                 echo "Preparing Helm Deployments"
                                 sed -i "s/IMAGE_VERSION/${params.image_version}/g" values-${params.Deploy_to}.yaml
