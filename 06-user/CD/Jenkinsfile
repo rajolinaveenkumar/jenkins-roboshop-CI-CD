@@ -70,6 +70,38 @@ pipeline {
                 }
             }
         }
+
+        stage('Functional/API Tests') {
+            when{
+                expression { params.environment == 'dev'}
+            }
+            
+            steps {
+                script{
+                    
+                        sh """
+                            echo "functional tests will be performed after DEV deployment. Usual;y these are automated selenium test cases written by testing team. If these test cases are failed pipeline also fails"
+                        """
+                    
+                }
+            }
+        }
+
+        stage('Integration Tests') {
+            when{
+                expression { params.deploy_to == 'qa'}
+            }
+            
+            steps {
+                script{
+                    
+                        sh """
+                            echo "integrations tests will be performed after QA/UAT deployment. Usually these are automated BDD(Behaviour driven development) test cases in cucumber framework written by testing team. If these test cases are failed pipeline also fails"
+                        """
+                    
+                }
+            }
+        }
     }
 
 
