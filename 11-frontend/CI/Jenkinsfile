@@ -63,15 +63,18 @@ pipeline {
             }
 
             steps {
-                withSonarQubeEnv('sonar-7.0')
-                dir('11-frontend/CI') {
-                    sh """
-                        $SCANNER_HONE/bin/sonar-scanner
-                    """
+                withSonarQubeEnv('sonar-7.0') {
+                    dir('11-frontend/CI') {
+                        sh """
+                            $SCANNER_HONE/bin/sonar-scanner
+                        """
+                    }
                 }
             }
 
         }
+
+        
 
         stage('Quality Gate') {
             steps {
