@@ -43,7 +43,7 @@ pipeline {
                                     
                                     pwd                            
 
-                                    sed -i "s/IMAGE_VERSION/${params.image_version}/g" ${component}-${env_name}.yaml
+                                    sed -i "s/IMAGE_VERSION/${params.image_version}/g" values-${env_name}.yaml
                                     helm upgrade --intsall ${component}-chart -f values-${env_name}.yaml .
 
                                 """
