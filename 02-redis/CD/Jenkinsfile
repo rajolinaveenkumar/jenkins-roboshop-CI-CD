@@ -52,21 +52,81 @@ pipeline {
                         }
 
                         catch (err) {
-                            echo "Helm upgrade failed. Rollback to previews version "
+                            echo "Helm upgrade failed. Rollback to Previous version "
 
                             sh """ 
-                                echo "Rollback the previews version"
+                                echo "Rollback the Previous version"
                                 helm rollback ${component}-chart -n ${namespace}
                                 sleep 30 # wait for pods to stabilize
                             """
 
-                            // check status after rollback
+                            // check the rollout status after rollback
 
+                            def rolloutStatus = sh (
+                                script: "kubectl rollout status deployment/${component} -n ${namespace} || echo FAILED"
+                                returnstdout: true
+                            ).trim()
+
+                            if (rolloutStatus.containes("successfully rolled out")) {
+                                echo "Rollback to previous version successfull"
+                                error "New deployment is failed and rolled back to previous version"
+                            
+                            } else {
+                                error "New deployment is failed and rollback also failed"
+                            }
 
                         }
                     }
                 }
             }
+        }
+
+        stage('Functional/API Tests') {
+            when{
+                expression { params.environment == 'dev'}
+            }
+            
+            steps {
+                script{
+                    
+                        sh """
+                            echo "functional tests will be performed after DEV deployment. Usual;y these are automated selenium test cases written by testing team. If these test cases are failed pipeline also fails"
+                        """
+                    
+                }
+            }
+        }
+
+        stage('Integration Tests') {
+            when{
+                expression { params.deploy_to == 'qa'}
+            }
+            
+            steps {
+                script{
+                    
+                        sh """
+                            echo "integrations tests will be performed after QA/UAT deployment. Usually these are automated BDD(Behaviour driven development) test cases in cucumber framework written by testing team. If these test cases are failed pipeline also fails"
+                        """
+                    
+                }
+            }
+        }
+        
+    }
+
+    post {
+        always {
+            echo "this run always"
+            deleteDir()
+        }
+
+        success {
+            echo "This runs only when success"
+        }
+
+        failure {
+            echo "This runs only when failure"
         }
     }
 
