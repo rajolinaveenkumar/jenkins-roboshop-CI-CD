@@ -42,7 +42,7 @@ pipeline {
                                 cd 02-redis/CD
 
                                 echo "Preparing Helm Deployments"
-                                sed -i "s/IMAGE_VERSION/${params.image_version}" values-${params.Deploy_to}
+                                sed -i "s/IMAGE_VERSION/${params.image_version}/g" values-${params.Deploy_to}
 
                                 echo "Deploying new version with helm"
                                 helm upgrade --install ${component}-chart -n ${namespace} -f values-${params.Deploy_to} .
