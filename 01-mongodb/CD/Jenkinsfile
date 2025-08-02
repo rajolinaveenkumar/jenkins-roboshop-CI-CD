@@ -43,7 +43,7 @@ pipeline {
                                 sed -i "s/IMAGE_VERSION/${params.image_version}/g" values-${params.environment}.yaml
 
                                 echo "Deploying new version with Helm..."
-                                helm upgrade --intsall ${component}-chart -n ${namespace} -f values-${params.environment}.yaml
+                                helm upgrade --install ${component}-chart -n ${namespace} -f values-${params.environment}.yaml
 
                             """
                         } catch (err) {
