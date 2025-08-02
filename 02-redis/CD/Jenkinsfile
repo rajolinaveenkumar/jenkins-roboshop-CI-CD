@@ -68,7 +68,7 @@ pipeline {
                                 returnStdout: true
                             ).trim()
 
-                            if (rolloutStatus.containes("successfully rolled out")) {
+                            if (rolloutStatus.contains("successfully rolled out")) {
                                 echo "Rollback to previous version successfull"
                                 error "New deployment is failed and rolled back to previous version"
                             

@@ -55,11 +55,11 @@ pipeline {
                                 """
 
                                 def rolloutStatus = sh(
-                                    script: "kubectl get deployments/${component} -n ${namespace} || echo Failed"
+                                    script: "kubectl get deployments/${component} -n ${namespace} || echo FAILED",
                                     returnStdout: true
                                 ).trim()
 
-                                if(rolloutStatus.containes("successfully rolled out")) {
+                                if(rolloutStatus.contains("successfully rolled out")) {
                                     echo "helm upgrade failed and rollback to previous version"
                                     error "Helm upgrade failed. Please check and resolve the issue"             
                                 } else {
