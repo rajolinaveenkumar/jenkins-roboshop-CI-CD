@@ -16,7 +16,7 @@ pipeline {
     options {
         ansiColor('xtrem')
         timeout(time: 40, unit: 'MINUTES') // fail the build it runs more than 40 min
-        disableConcurrentBuild() // dont allow another build to start while this one is running
+        disableConcurrentBuilds() // dont allow another build to start while this one is running
         // retry(2) // retry failed stages up to 2 times
         // disableResume() // don't resume failed or aborted pipeline
         timestamps()
@@ -30,9 +30,9 @@ pipeline {
 
         choice(name: 'environment', choices: ['dev', 'staging', 'UAT', 'QA', 'pre-prod', 'prod'], description: 'please select the environment')
 
-        boolenParam(name: 'Build_Image', defaultValue: false, description: 'Please check the box to build the image')
+        booleanParam(name: 'Build_Image', defaultValue: false, description: 'Please check the box to build the image')
 
-        boolenParam(name: 'Deploy', defaultValue: false, description: 'please select to deploy')
+        booleanParam(name: 'Deploy', defaultValue: false, description: 'please select to deploy')
 
         
     }
