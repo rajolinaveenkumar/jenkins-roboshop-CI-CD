@@ -76,7 +76,7 @@ pipeline {
             }
 
             steps {
-                build job: "${component}-CD", parameters:[string(name: 'image_version', value: "${params.image_version}"), string(name: 'env_name', value: "${params.env_name}") ]
+                build job: "${component}-CD", parameters:[string(name: 'image_version', value: "${params.image_version}"), string(name: 'environment', value: "${params.environment}") ]
             }
         }
     }
