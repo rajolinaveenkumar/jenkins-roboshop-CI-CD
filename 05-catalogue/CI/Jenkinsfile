@@ -29,38 +29,38 @@ pipeline {
     }
 
     stages {
-        stage('read the version') {
+        // stage('read the version') {
             
-            steps {
-                script {
+        //     steps {
+        //         script {
                     
-                    def packagejson = readJSON file: '05-catalogue/CI/scripts/package.json'
-                    appversion = packagejson.version
-                    echo "app version is ${appversion}"
-                }
-            }
-        }
+        //             def packagejson = readJSON file: '05-catalogue/CI/scripts/package.json'
+        //             appversion = packagejson.version
+        //             echo "app version is ${appversion}"
+        //         }
+        //     }
+        // }
 
-        stage('Install Dependencies') {
-            steps {
-                script {
-                    sh """
-                        cd 05-catalogue/CI/scripts/
-                        npm install
-                    """
-                }
-            }
-        }
+        // stage('Install Dependencies') {
+        //     steps {
+        //         script {
+        //             sh """
+        //                 cd 05-catalogue/CI/scripts/
+        //                 npm install
+        //             """
+        //         }
+        //     }
+        // }
 
-        stage('Unit Tests') {
-            steps {
-                script {
-                    sh """
-                        echo "Unit tests are created by developers, we will configure the command like npm test"
-                    """
-                }
-            }
-        }
+        // stage('Unit Tests') {
+        //     steps {
+        //         script {
+        //             sh """
+        //                 echo "Unit tests are created by developers, we will configure the command like npm test"
+        //             """
+        //         }
+        //     }
+        // }
         
         stage('Sonar Qube') {
             environment {
