@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-svc
+  namespace: roboshop
+  labels:
+    project: roboshop
+    component: rabbitmq
+    environment: dev
+    tier: backend
+    code: rabbitmq-roboshop-dev
+spec:
+  selector:
+    code: rabbitmq-roboshop-dev
+  ports:
+  - protocol: TCP
+    port: 5672 
+    targetPort: 5672 

@@ -1,0 +1,126 @@
+pipeline {
+    agent {
+        label 'agent-1-label'
+    }
+
+    environment {
+        project = 'roboshop'
+        env_name = 'dev'
+        tier = 'database'
+        namespace = 'roboshop'
+        component = 'rabbitmq'
+        acc_id = '343430925817'
+        region = 'us-east-1'
+        label = 'agent-1-label'
+    }
+    options {
+        ansiColor('xtrem')
+        timeout(time: 40, unit: 'MINUTES')
+        disableConcurrentBuilds()
+        timestamps()
+    }
+
+    parameters {
+        string(name: 'image_version', defaultValue: '', description: 'please enter image version')
+        choice(name: 'environment', choices: ['dev', 'staging', 'UAT', 'QA', 'pre-prod', 'prod'], description: 'please choose the environment')
+    }
+
+    stages {
+        stage('Deploy into k8') {
+            steps {
+                script {
+                    withAWS(region: 'us-east', credentails: 'aws-auth' ) {
+                        try {
+                            sh """
+                                echo "Setting up kubeconfig"
+                                aws eks update-kubeconfig --region ${region} --name roboshop-${params.environment}-eks
+
+                                echo "Checking cluster nodes"
+                                kubectl get nodes
+
+                                echo "Preparing Helm deployment..."
+                                cd 03-rabbitmq/CD/rabbitmq-helm
+                                                                
+                                echo "Deploying new version with Helm..."
+                                helm upgrade --install ${component}-chart -n ${namespace} .
+
+                            """
+                        } 
+                        catch (err) {
+                            echo "Helm upgare failed. Atempting rollback"
+                            echo "Rollback to previews version"
+
+                            sh """
+                                helm rollback ${component}-chart -n ${namespace}
+                                sleep 30 # wait for pods to stabilize
+                            """
+                            // Check rollout status after rollback
+                            def rolloutStatus = sh(
+                            script: "kubectl rollout status deployment/${COMPONENT} -n ${PROJECT} || echo FAILED",
+                            returnStdout: true
+                            ).trim()
+
+                            if (rolloutStatus.contains("successfully rolled out")) {
+                            echo "Rollback succeeded. But pipeline will fail to notify issue with new release."
+                            error("New deployment failed, rollback successful. Please check the new version.")
+                            } else {
+                                error("Rollback also failed. Previous version is not running.")
+                            }
+
+                        }              
+                    }
+                }
+            }
+        }
+
+        stage('Functional/API Tests') {
+            when{
+                expression { params.environment == 'dev'}
+            }
+            
+            steps {
+                script{
+                    
+                        sh """
+                            echo "functional tests will be performed after DEV deployment. Usual;y these are automated selenium test cases written by testing team. If these test cases are failed pipeline also fails"
+                        """
+                    
+                }
+            }
+        }
+
+        stage('Integration Tests') {
+            when{
+                expression { params.deploy_to == 'qa'}
+            }
+            
+            steps {
+                script{
+                    
+                        sh """
+                            echo "integrations tests will be performed after QA/UAT deployment. Usually these are automated BDD(Behaviour driven development) test cases in cucumber framework written by testing team. If these test cases are failed pipeline also fails"
+                        """
+                    
+                }
+            }
+        }
+        
+    
+    }
+
+    post {
+        always {
+            echo "this run always"
+            deleteDir()
+        }
+
+        success {
+            echo "this run only success"
+        }
+
+        failure {
+            echo "This run only at failure"
+        }
+    }
+
+}

@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: rabbitmq 
+  namespace: roboshop
+  labels:
+    project: roboshop
+    component: rabbitmq
+    environment: dev
+    tier: backend
+    code: rabbitmq-roboshop-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      code: rabbitmq-roboshop-dev
+  template:
+    metadata:
+      labels:
+        project: roboshop
+        component: rabbitmq
+        environment: dev
+        tier: backend
+        code: rabbitmq-roboshop-dev
+    spec:
+      containers:
+      - name: rabbitmq-pod
+        image: rabbitmq
+        ports:
+        - containerPort: 5672 
+        envFrom:
+        - configMapRef:
+            name: rabbitmq-configmap
