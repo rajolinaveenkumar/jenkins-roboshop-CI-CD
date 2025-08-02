@@ -43,9 +43,9 @@ pipeline {
 
                                     cd ${component}-helm
 
-                                    sed -i "s/IMAGE_VERSION/${params.image_version}/g" values-${params.Deploy_to}
+                                    sed -i "s/IMAGE_VERSION/${params.image_version}/g" values-${params.Deploy_to}.yaml
 
-                                    helm upgrade --install ${component}-chart -n ${namespace} -f values-${params.Deploy_to}.
+                                    helm upgrade --install ${component}-chart -n ${namespace} -f values-${params.Deploy_to}.yaml .
                                 """
                             }
 
