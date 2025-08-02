@@ -7,7 +7,7 @@ pipeline {
         project = 'roboshop'
         env_name = 'dev'
         tier = 'web'
-        component = 'frontend'
+        component = 'frontendroboshop'
         acc_id = '343430925817'
         region = 'us-east-1'
         label = 'agent-1-label'
