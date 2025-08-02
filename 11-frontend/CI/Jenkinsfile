@@ -66,12 +66,12 @@ pipeline {
                 withSonarQubeEnv('sonar-7.0') {
                     dir('11-frontend/CI') {
                         sh """
-                            $SCANNER_HONE/bin/sonar-scanner
+                            ls -la
+                            $SCANNER_HOME/bin/sonar-scanner
                         """
                     }
                 }
             }
-
         }
 
         
