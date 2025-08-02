@@ -122,4 +122,18 @@ pipeline {
         }
     }
 
+    post {
+        always {
+            echo "this run always "
+            deleteDir()
+        }
+        success {
+            echo "this run only when success"
+        }
+
+        failure {
+            echo "this run only when failure"
+        }
+    }
+
 }
