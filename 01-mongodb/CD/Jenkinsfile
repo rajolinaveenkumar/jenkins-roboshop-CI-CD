@@ -33,7 +33,7 @@ pipeline {
                         try {
                             sh """
                                 echo "Setting up kubeconfig"
-                                aws eks update-kubeconfig --region ${region} --name expense-${params.environment}
+                                aws eks update-kubeconfig --region ${region} --name roboshop-${params.environment}-eks
 
                                 echo "Checking cluster nodes"
                                 kubectl get nodes
