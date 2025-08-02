@@ -62,6 +62,17 @@ pipeline {
             }
         }
         
+        stage('Sonar Qube') {
+            environment {
+                SCANNER_HOME = tool 'sonar-6.0'
+            }
+
+            steps {
+                withSonarQubeEnv('SCANNER_HOM') {
+                    sh "$SCANNER_HOME/bin/sonnar-scanner"
+                }
+            }
+        }
     }
 
     post {
