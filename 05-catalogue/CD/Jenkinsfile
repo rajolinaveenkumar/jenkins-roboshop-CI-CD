@@ -59,7 +59,7 @@ pipeline {
                                 """
 
                                 def rolloutStatus = sh(
-                                    script: "kubectl rollout status deployment/${COMPONENT} -n ${PROJECT} || echo FAILED",
+                                    sscript: "kubectl rollout status deployment/${component} -n ${project} || echo FAILED",
                                     returnStdout: true
                                 ).trim()
 
