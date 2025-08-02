@@ -13,7 +13,7 @@ pipeline {
         label = 'agent-1-label'
     }
 
-    optiones {
+    options {
         ansiColor('xtrem') 
         timeout(time: 40, unit: 'MINUTES')
         disableConcurrentBuilds()
@@ -24,14 +24,16 @@ pipeline {
         string(name: 'SNOW_CR', defaultValue: '', description: 'please provide change request')
         string(name: 'image_version', defaultValue: '', description: 'please provide image version')
         choice(name: 'environment', choices: ['dev', 'staging', 'qa', 'pre-prod', 'prod'], description: 'please select the environment')
-        booleanParam(name: 'BUILD_IMAGE', defaultValue: false, description: 'Check the box to build the image')
+        booleanParam(name: 'Build_Image', defaultValue: false, description: 'Check the box to build the image')
         booleanParam(name: 'Deploy', defaultValue: fasle, description: 'check the box to deploy')
     }
 
     stages {
         when {
             expression {
-                params.BUILD_IMAGE
+                
+                params.Build_Image
+                
             }
         }
         stage('Build the image') {
