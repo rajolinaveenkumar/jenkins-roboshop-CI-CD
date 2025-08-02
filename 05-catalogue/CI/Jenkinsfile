@@ -90,7 +90,7 @@ pipeline {
         stage('Build the image') {
             when {
                 expression {
-                    param.Build_Image
+                    params.Build_Image
                 }
             }
             steps {
@@ -109,13 +109,13 @@ pipeline {
             }
         }
 
-        // stage('Trigger Deploy') {
-        //     steps {
-        //         script {
-        //             build job: "${component}-CD", parameters: [string(name: 'image_version', )]
-        //         }
-        //     }
-        // }
+        stage('Trigger Deploy') {
+            steps {
+                script {
+                    build job: "${component}-CD", parameters: [string(name: 'image_version', value: "${appversion}"), string(name: 'Deploy_to', value: "${params.environment}")]
+                }
+            }
+        }
 
     }
 
