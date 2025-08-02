@@ -38,7 +38,7 @@ pipeline {
                 dir('06-use/CI') {
                     script {
                         def packagejson = readJSON file: 'code/package.json'
-                        appversion = packagejson,version
+                        appversion = packagejson.version
                         echo "appversion is ${appversion}"
                     }
                 }
