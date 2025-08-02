@@ -70,7 +70,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('sonar-7.0') {
                     sh """
-                        cd 05-catalogue/CI/scripts
+                        
                         $SCANNER_HOME/bin/sonar-scanner
                     """
                     
