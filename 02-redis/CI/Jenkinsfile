@@ -25,7 +25,7 @@ pipeline {
         string(name: 'image_version', defaultValue: '', description: 'please provide image version')
         choice(name: 'environment', choices: ['dev', 'staging', 'qa', 'pre-prod', 'prod'], description: 'please select the environment')
         booleanParam(name: 'Build_Image', defaultValue: false, description: 'Check the box to build the image')
-        booleanParam(name: 'Deploy', defaultValue: fasle, description: 'check the box to deploy')
+        booleanParam(name: 'Deploy', defaultValue: false, description: 'check the box to deploy')
     }
 
     stages {
