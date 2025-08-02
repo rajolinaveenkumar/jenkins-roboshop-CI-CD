@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-svc 
+  namespace: roboshop
+  labels:
+    component: mongodb
+    tier: database
+    project: roboshop
+    code: mongo-db-rs-dev
+spec:
+  selector:
+    code: mongo-db-rs-dev
+  ports:
+  - protocol: TCP
+    port: 27017 # service port
+    targetPort: 27017 # target port

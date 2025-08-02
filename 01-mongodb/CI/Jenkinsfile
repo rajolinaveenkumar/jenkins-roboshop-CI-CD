@@ -1,0 +1,92 @@
+pipeline {
+    agent {
+        label 'agent-1-label'
+    }
+
+    environment {
+        project = 'roboshop'
+        env_name = 'dev'
+        tier = 'database'
+        component = 'mongodb'
+        acc_id = '343430925817'
+        region = 'us-east-1'
+        label = 'agent-1-label'
+    }
+
+    options {
+        ansiColor('xtrem')
+        timeout(time: 40, unit: 'MINUTES') // fail the build it runs more than 40 min
+        disableConcurrentBuild() // dont allow another build to start while this one is running
+        // retry(2) // retry failed stages up to 2 times
+        // disableResume() // don't resume failed or aborted pipeline
+        timestamps()
+    }
+
+    parameters {         
+
+        string(name: 'SNOW_CR', defaultValue: '', description: 'please provide Servicenow Change Request')
+
+        string(name: 'image_version', defaultValue: '', description: 'image version')
+
+        choice(name: 'environment', choices: ['dev', 'staging', 'UAT', 'QA', 'pre-prod', 'prod'], description: 'please select the environment')
+
+        boolenParam(name: 'Build_Image', defaultValue: false, description: 'Please check the box to build the image')
+
+        boolenParam(name: 'Deploy', defaultValue: false, description: 'please select to deploy')
+
+        
+    }
+
+    stages {
+        stage('Build Image') {
+            when {
+                expression {
+                    params.Build_Image
+                }
+            }
+            steps {
+                withAWS(region: 'us-east', credentials: 'aws-auth') {
+                    sh """
+                        aws ecr get-login-password --region ${region} | docker login --username AWS --password-stdin ${acc_id}.dkr.ecr.${region}.amazonaws.com
+
+                        docker build -t ${acc_id}.dkr.ecr.${region}.amazonaws.com/${project}-${params.environment}/${component}:${params.image_version} .
+
+                        docker images
+
+                        docker push ${acc_id}.dkr.ecr.${region}.amazonaws.com/${project}-${params.environment}/${component}:${params.image_version}
+
+
+                    """
+                }
+
+            }
+        }
+
+        stage('Trigger the Deploy Job') {
+            when {
+                expression {
+                    params.Deploy
+                }
+            }
+
+            steps {
+                build job: "${component}-CD", parameters:[string(name: 'image_version', value: "${params.image_version}"), string(name: 'env_name', value: "${params.env_name}") ]
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "this run always"
+            deleteDir()
+        }
+
+        success {
+            echo "this run only success"
+        }
+
+        failure {
+            echo "This run only at failure"
+        }
+    }
+}

@@ -1,0 +1,3 @@
+deployment:
+  image_url: 343430925817.dkr.ecr.us-east-1.amazonaws.com/roboshop-dev/mongodb
+  image_version: 1.0.0
