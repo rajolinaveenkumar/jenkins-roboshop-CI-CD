@@ -75,7 +75,7 @@ pipeline {
 
         stage('Functional/API Tests') {
             when{
-                expression { params.deploy_to == 'dev'}
+                expression { params.environment == 'dev'}
             }
             
             steps {
