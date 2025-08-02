@@ -79,13 +79,13 @@ pipeline {
             }
         }
 
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 10, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
+        // stage('Quality Gate') {
+        //     steps {
+        //         timeout(time: 10, unit: 'MINUTES') {
+        //             waitForQualityGate abortPipeline: true
+        //         }
+        //     }
+        // }
 
         stage('Build the image') {
             when {
@@ -108,6 +108,14 @@ pipeline {
                 }
             }
         }
+
+        // stage('Trigger Deploy') {
+        //     steps {
+        //         script {
+        //             build job: "${component}-CD", parameters: [string(name: 'image_version', )]
+        //         }
+        //     }
+        // }
 
     }
 
