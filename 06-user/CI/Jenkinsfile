@@ -49,7 +49,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                        cd 06-use/CI/code
+                        cd 06-user/CI/code
                         npm install
                     """
                 }
