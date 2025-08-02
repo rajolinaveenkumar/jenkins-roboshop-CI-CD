@@ -44,7 +44,7 @@ pipeline {
                                     pwd                            
 
                                     sed -i "s/IMAGE_VERSION/${params.image_version}/g" values-${env_name}.yaml
-                                    helm upgrade --intsall ${component}-chart -f values-${env_name}.yaml .
+                                    helm upgrade --install ${component}-chart -f values-${env_name}.yaml .
 
                                 """
 
