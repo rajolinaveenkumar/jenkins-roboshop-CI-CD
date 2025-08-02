@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalogue
+  namespace: roboshop
+  labels:
+    project: roboshop
+    component: catalogue
+    environment: dev
+    tier: backend
+    code: catalogue-roboshop-dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      code: catalogue-roboshop-dev
+  template:
+    metadata:
+      labels:
+        project: roboshop
+        component: catalogue
+        environment: dev
+        tier: backend
+        code: catalogue-roboshop-dev
+    spec:
+      containers:
+      - name: catalogue
+        image: "{{ .Values.deployment.image_url }}:{{ .Values.deployment.image_version }}"
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: catalogue-configmap
+
+

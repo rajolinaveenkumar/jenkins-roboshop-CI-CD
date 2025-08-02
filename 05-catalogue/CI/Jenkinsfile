@@ -1,0 +1,57 @@
+pipeline {
+    agent none
+
+    environment {
+        project = 'roboshop'
+        env_name = 'dev'
+        tier = 'database'
+        component = 'mongodb'
+        acc_id = '343430925817'
+        region = 'us-east-1'
+        label = 'agent-1-label'
+        appversion = ''
+    }
+
+    options {
+        anisColor('xtrem')
+        disableConcurrentBuilds()
+        timeout(time: 30, unit: 'MINUTES')
+        timestamps()
+    }
+
+    parameters {
+        string(name: 'SNOW_CR', defaultValue: '', description: 'Please provide the snow change request')
+        choice(name: 'environment', choices: ['dev', 'staging', 'qa', 'uat', 'prod'], description: 'please choose the environment')
+        booleanParam(name: 'Build_Image', defaultValue: false, description: 'please check the box to build the image')
+        booleanParam(name: 'Deploy', defaultValue: false, description: 'please check the box to deploy')
+    }
+
+    stages {
+        stage('read the version') {
+            agent {
+                label 'agent-1-label'
+            }
+            steps {
+                script {
+                    def packagejson = readJSON file: 'scripts/package.json'
+                    appversion = packagejson.version
+                    echo "app version is ${appversion}"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "this run always "
+            deleteDir()
+        }
+        success {
+            echo "this run only when success"
+        }
+
+        failure {
+            echo "this run only when failure"
+        }
+    }
+}
