@@ -96,7 +96,7 @@ pipeline {
             steps {
                 dir('05-catalogue/CI') {
                     script {
-                        withAWS(region: 'us-east-1', credentials: 'aws-auth')
+                        withAWS(region: 'us-east-1', credentials: 'aws-auth') {
                             sh """
                                 aws ecr get-login-password --region ${region} | docker login --username AWS --password-stdin ${acc_id}.dkr.ecr.${region}.amazonaws.com
 
@@ -104,6 +104,7 @@ pipeline {
 
                                 docker push ${acc_id}.dkr.ecr.${region}.amazonaws.com/${project}-${params.environment}/${component}:${appversion}           
                             """
+                        }
                     }
                 }
             }
