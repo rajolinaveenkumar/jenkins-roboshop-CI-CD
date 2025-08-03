@@ -50,7 +50,7 @@ pipeline {
                         sh """
                             pwd
                             ls -la
-                            sh 'pip3.11 install -r requirements.txt'
+                            pip3.11 install -r requirements.txt
                         """
                     }
 
