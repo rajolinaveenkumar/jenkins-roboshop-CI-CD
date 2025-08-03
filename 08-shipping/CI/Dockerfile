@@ -13,6 +13,6 @@ RUN mkdir /opt/server
 run chown roboshop:roboshop /opt/server
 # chown <user>:<group> <path>
 WORKDIR /opt/server
-COPY --from=builder /opt/server/target/shipping-1.0.jar /opt/server/shipping.jar
+COPY --from=builder /opt/server/target/shipping-1.0.0.jar /opt/server/shipping.jar
 USER roboshop
 CMD ["java", "-jar", "shipping.jar"]
