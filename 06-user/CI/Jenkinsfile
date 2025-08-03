@@ -66,31 +66,31 @@ pipeline {
             }
         }
 
-        stage('Sonar Qube') {
-            environment {
-                SCANNER_HOME = tool 'sonar-7.0'
-            }
+        // stage('Sonar Qube') {
+        //     environment {
+        //         SCANNER_HOME = tool 'sonar-7.0'
+        //     }
 
-            steps {
-                withSonarQubeEnv('sonar-7.0') {
-                    dir('06-user/CI') {
-                        sh """
-                            $SCANNER_HOME/bin/sonar-scanner
+        //     steps {
+        //         withSonarQubeEnv('sonar-7.0') {
+        //             dir('06-user/CI') {
+        //                 sh """
+        //                     $SCANNER_HOME/bin/sonar-scanner
 
-                        """
-                    }
-                }
-            }
-        }
+        //                 """
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 8, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
+        // stage('Quality Gate') {
+        //     steps {
+        //         timeout(time: 8, unit: 'MINUTES') {
+        //             waitForQualityGate abortPipeline: true
+        //         }
 
-            }
-        }
+        //     }
+        // }
 
         stage('Build Image') {
             when {

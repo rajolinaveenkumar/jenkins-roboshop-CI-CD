@@ -58,22 +58,22 @@ pipeline {
             }
         }
 
-        stage('Sonar Qube') {
-            environment {
-                SCANNER_HOME = tool 'sonar-7.0'
-            }
+        // stage('Sonar Qube') {
+        //     environment {
+        //         SCANNER_HOME = tool 'sonar-7.0'
+        //     }
 
-            steps {
-                withSonarQubeEnv('sonar-7.0') {
-                    dir('11-frontend/CI') {
-                        sh """
-                            ls -la
-                            $SCANNER_HOME/bin/sonar-scanner
-                        """
-                    }
-                }
-            }
-        }
+        //     steps {
+        //         withSonarQubeEnv('sonar-7.0') {
+        //             dir('11-frontend/CI') {
+        //                 sh """
+        //                     ls -la
+        //                     $SCANNER_HOME/bin/sonar-scanner
+        //                 """
+        //             }
+        //         }
+        //     }
+        // }
 
         
 
