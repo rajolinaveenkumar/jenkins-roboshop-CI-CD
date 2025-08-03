@@ -48,6 +48,8 @@ pipeline {
                 dir('09-payment/CI/code') {
                     script {
                         sh """
+                            pwd
+                            ls -la
                             sh 'pip3.11 install -r requirements.txt'
                         """
                     }
