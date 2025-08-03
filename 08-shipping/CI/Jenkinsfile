@@ -1,0 +1,146 @@
+pipeline {
+    agent {
+        label 'agent-1-label'
+    }
+
+    environment {
+        project = 'roboshop'
+        env_name = 'dev'
+        tier = 'backend'
+        component = 'shipping'
+        acc_id = '343430925817'
+        region = 'us-east-1'
+        label = 'agent-1-label'
+        namespace = 'roboshop'
+    }
+    options {
+        ansiColor('xtrem')
+        disableConcurrentBuilds()
+        timeout(time: 10, unit: 'MINUTES')
+        timestamps()
+    }
+
+    parameters {
+        string(name: 'SNOW_CR', defaultValue: '', description: 'Please enter the chnage request')
+        choice(name: 'environment', choices: ['dev', 'non-prod', 'qa', 'prod'], description: 'Please select the environment')
+        booleanParam(name: 'Build_image', defaultValue: false, description: 'Please eneter the build image')
+        booleanParam(name: 'deploy', defaultValue: false, description: 'Please check the box to deploy the image')
+    }
+
+
+    stages {
+        stage ('Read the Version') {
+            steps {
+                dir('08-shipping/CI/code') {
+                    script {
+                        def pomxml = readMavenPom file: 'pom.xml'
+                        appversion = pomxml.version
+                        echo "App version: ${appversion}"
+                    }
+                    
+                }
+            }
+        }
+
+        stage('Intsall Dependencies') {
+            steps {
+                dir('08-shipping/CI/code') {
+                    script {
+                        sh """
+                            mvn clean package
+                        """
+                    }
+
+                }
+            }
+        }
+
+        stage('Unit Test') {
+            steps {
+                script {
+                    sh """
+                        echo ""Unit tests are created by developers, we will configure the command like mvn test""
+                    """
+                }
+            }
+        }
+
+        // stage('Sonar Qube') {
+        //     environment {
+        //         SCANNER_HOME = tool 'sonar-7.0'
+        //     }
+
+        //     steps {
+        //         withSonarQubeEnv('sonar-7.0') {
+        //             dir('07-cart/CI') {
+        //                 sh """
+        //                     ls -la
+        //                     $SCANNER_HOME/bin/sonar-scanner
+        //                 """
+        //             }
+        //         }
+        //     }
+        // }
+
+        // stage('Quality Gate') {
+        //     steps {
+        //         timeout(time: 10, unit: 'MINUTES') {
+        //             waitForQualityGate abortPipeline: true
+        //         }
+        //     }
+        // }
+
+        stage('Build Image') {
+            when {
+                expression {
+                    params.Build_image
+                }
+            }
+
+            steps {
+                dir('08-shipping/CI') {
+                    script {
+                        withAWS(region: 'us-east-1', credentials: 'aws-auth') {
+                            sh """
+                                aws ecr get-login-password --region ${region} | docker login --username AWS --password-stdin ${acc_id}.dkr.ecr.${region}.amazonaws.com
+
+                                docker build -t ${acc_id}.dkr.ecr.${region}.amazonaws.com/${project}-${params.environment}/${component}:${appversion} .
+
+                                docker push ${acc_id}.dkr.ecr.${region}.amazonaws.com/${project}-${params.environment}/${component}:${appversion}  
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Trigger Deploy') {
+            when {
+                expression {
+                    params.Deploy
+                }
+            }
+            steps {
+                script {
+                    build job: "${component}-CD", parameters: [string(name: 'image_version', value: "${appversion}"), string(name: 'Deploy_to', value: "${params.environment}")]
+                }
+            }
+        }
+
+    }
+
+    post {
+        always {
+            echo "this run always "
+            deleteDir()
+        }
+        success {
+            echo "this run only when success"
+        }
+
+        failure {
+            echo "this run only when failure"
+        }
+    }
+
+}

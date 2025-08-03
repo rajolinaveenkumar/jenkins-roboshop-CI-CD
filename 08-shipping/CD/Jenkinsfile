@@ -7,7 +7,7 @@ pipeline {
         project = 'roboshop'
         env_name = 'dev'
         tier = 'backend'
-        component = 'catalogue'
+        component = 'shipping'
         acc_id = '343430925817'
         region = 'us-east-1'
         label = 'agent-1-label'
@@ -27,9 +27,91 @@ pipeline {
     }
 
     stages {
-        stage 
-    }
+        stage('Deploy') {
+            steps {
+                dir('08-shipping/CD') {
+                   script {
+                        withAWS(region: 'us-east-1', credentials: 'aws-auth') {
+                            try {
+                                sh """
+                                    aws eks update-kubeconfig --region ${region} --name ${project}-${env_name}-eks
 
+                                    kubectl get nodes
+                                    pwd
+                                    ls -la
+                                    cd ${component}-helm 
+                                    
+                                    pwd                            
+
+                                    sed -i "s/IMAGE_VERSION/${params.image_version}/g" values-${env_name}.yaml
+                                    helm upgrade --install ${component}-chart -f values-${env_name}.yaml .
+
+                                """
+
+                            }
+
+                            catch (err) {
+                                echo "Helm upgrade is failed, rollback to previous version" 
+
+                                sh """
+                                    helm rollback ${component}-chart -n ${project}
+                                    sleep 30
+                                """
+
+                                def rolloutStatus = sh(
+                                    script: "kubectl rollout status deployment/${component} -n ${project} || echo FAILED",
+                                    returnStdout: true
+                                ).trim()
+
+                                if(rolloutStatus.contains("successfully rolled out")) {
+                                    echo "helm upgrade failed and rollback to previous version"
+                                    error "Helm upgrade failed. Please check and resolve the issue"             
+                                } else {
+                                    error "Helm upgrade and rollback is failed"
+                                }
+
+
+                            }
+                        }
+
+                   }
+                }
+            }
+        
+        }
+        stage('Functional/API Tests') {
+            when{
+                expression { params.environment == 'dev'}
+            }
+            
+            steps {
+                script{
+                    
+                        sh """
+                            echo "functional tests will be performed after DEV deployment. Usual;y these are automated selenium test cases written by testing team. If these test cases are failed pipeline also fails"
+                        """
+                    
+                }
+            }
+        }
+
+        stage('Integration Tests') {
+            when{
+                expression { params.deploy_to == 'qa'}
+            }
+            
+            steps {
+                script{
+                    
+                        sh """
+                            echo "integrations tests will be performed after QA/UAT deployment. Usually these are automated BDD(Behaviour driven development) test cases in cucumber framework written by testing team. If these test cases are failed pipeline also fails"
+                        """
+                    
+                }
+            }
+        }
+        
+    }
 
 
 
