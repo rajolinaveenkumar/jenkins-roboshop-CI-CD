@@ -5,4 +5,4 @@ deployment:
   image_url: 343430925817.dkr.ecr.us-east-1.amazonaws.com/roboshop-dev/frontendroboshop
   image_version: IMAGE_VERSION
 tgb:
-  arn: arn:aws:elasticloadbalancing:us-east-1:343430925817:targetgroup/roboshop-dev-frontend-TG/16ae04fb4f8d96b0
+  arn: arn:aws:elasticloadbalancing:us-east-1:343430925817:targetgroup/roboshop-dev-frontend-TG/b5ebde954a970245
