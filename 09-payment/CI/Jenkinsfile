@@ -7,7 +7,7 @@ pipeline {
         project = 'roboshop'
         env_name = 'dev'
         tier = 'backend'
-        component = 'shipping'
+        component = 'payment'
         acc_id = '343430925817'
         region = 'us-east-1'
         label = 'agent-1-label'
@@ -32,11 +32,11 @@ pipeline {
     stages {
         stage ('Read the Version') {
             steps {
-                dir('08-shipping/CI/code') {
+                dir('09-payment/CI/code') {
                     script {
-                        def pomxml = readMavenPom file: 'pom.xml'
-                        appversion = pomxml.version
-                        echo "App version: ${appversion}"
+                        def packagejson = readJSON file: 'package.json'
+                        appversion = packagejson.version
+                        echo "app version is ${appversion}"
                     }
                     
                 }
@@ -45,10 +45,10 @@ pipeline {
 
         stage('Intsall Dependencies') {
             steps {
-                dir('08-shipping/CI/code') {
+                dir('09-payment/CI/code') {
                     script {
                         sh """
-                            mvn clean package
+                            sh 'pip3.11 install -r requirements.txt'
                         """
                     }
 
@@ -99,7 +99,7 @@ pipeline {
             }
 
             steps {
-                dir('08-shipping/CI') {
+                dir('09-payment/CI') {
                     script {
                         withAWS(region: 'us-east-1', credentials: 'aws-auth') {
                             sh """
